@@ -1,0 +1,46 @@
+name: Build Android
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@latest
+
+      - name: Setup Expo session
+        run: |
+          mkdir -p ~/.expo
+          echo '${{ secrets.EXPO_SESSION }}' > ~/.expo/state.json
+          eas whoami
+
+      - name: Restore Google Play key
+        run: echo '${{ secrets.GOOGLE_PLAY_KEY }}' | base64 --decode > google-play-key.json
+
+      - name: Build Android AAB
+        run: eas build --platform android --profile production --local --non-interactive --output ./lairaboost.aab
+
+      - name: Submit to Google Play
+        run: eas submit --platform android --path ./lairaboost.aab --non-interactive
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lairaboost-android
+          path: ./lairaboost.aab
