@@ -20,7 +20,8 @@
         "image": "latest"
       },
       "android": {
-        "autoIncrement": true
+        "autoIncrement": true,
+        "credentialsSource": "local"
       }
     }
   },

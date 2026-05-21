@@ -32,6 +32,11 @@ jobs:
       - name: Restore Google Play key
         run: echo '${{ secrets.GOOGLE_PLAY_KEY }}' | base64 --decode > google-play-key.json
 
+      - name: Restore Android signing keystore
+        run: |
+          echo '${{ secrets.ANDROID_KEYSTORE }}' | base64 --decode > lairaboost-upload.jks
+          echo '${{ secrets.ANDROID_CREDENTIALS_JSON }}' > credentials.json
+
       - name: Build Android AAB
         run: eas build --platform android --profile production --local --non-interactive --output ./lairaboost.aab
 
